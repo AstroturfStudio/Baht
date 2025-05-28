@@ -197,6 +197,10 @@ fun AnimatedCoin(
                     ),
             contentAlignment = Alignment.Center,
         ) {
+            // Determine which side to show based on rotation
+            val normalizedRotation = (rotation % 360f + 360f) % 360f
+            val showHeadsSide = normalizedRotation > 90f && normalizedRotation < 270f
+
             if (showResult && result != null) {
                 Text(
                     text =
@@ -208,8 +212,9 @@ fun AnimatedCoin(
                     textAlign = TextAlign.Center,
                 )
             } else {
+                // During animation, show different sides based on rotation
                 Text(
-                    text = "🪙",
+                    text = if (showHeadsSide) "👑" else "🪙",
                     fontSize = 72.sp,
                     textAlign = TextAlign.Center,
                 )
@@ -333,4 +338,4 @@ fun ResultCard(result: CoinSide) {
 enum class CoinSide {
     HEADS,
     TAILS,
-} 
+}
