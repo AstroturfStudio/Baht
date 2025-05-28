@@ -47,6 +47,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BahtApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.RANDOM) }
+    val randomNavController = rememberNavController()
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -66,36 +67,46 @@ fun BahtApp() {
         },
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            when (currentDestination) {
-                AppDestinations.RANDOM -> RandomNavigation(modifier = Modifier.padding(innerPadding))
-                AppDestinations.TOURNAMENTS -> TournamentsScreen(modifier = Modifier.padding(innerPadding))
+            // Always render RandomNavigation but control its visibility
+            RandomNavigation(
+                navController = randomNavController,
+                isVisible = currentDestination == AppDestinations.RANDOM,
+                modifier = Modifier.padding(innerPadding),
+            )
+
+            if (currentDestination == AppDestinations.TOURNAMENTS) {
+                TournamentsScreen(modifier = Modifier.padding(innerPadding))
             }
         }
     }
 }
 
 @Composable
-fun RandomNavigation(modifier: Modifier = Modifier) {
-    val navController = rememberNavController()
-
-    NavHost(
-        navController = navController,
-        startDestination = "random_home",
-        modifier = modifier,
-    ) {
-        composable("random_home") {
-            RandomScreen(
-                onLuckyDrawClick = {
-                    navController.navigate("lucky_draw")
-                },
-            )
-        }
-        composable("lucky_draw") {
-            LuckyDrawScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
+fun RandomNavigation(
+    navController: androidx.navigation.NavHostController,
+    isVisible: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    if (isVisible) {
+        NavHost(
+            navController = navController,
+            startDestination = "random_home",
+            modifier = modifier,
+        ) {
+            composable("random_home") {
+                RandomScreen(
+                    onLuckyDrawClick = {
+                        navController.navigate("lucky_draw")
+                    },
+                )
+            }
+            composable("lucky_draw") {
+                LuckyDrawScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
