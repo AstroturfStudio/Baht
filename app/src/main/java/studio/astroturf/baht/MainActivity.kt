@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import studio.astroturf.baht.ui.coinFlip.CoinFlipScreen
 import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
@@ -98,10 +99,20 @@ fun RandomNavigation(
                     onLuckyDrawClick = {
                         navController.navigate("lucky_draw")
                     },
+                    onCoinFlipClick = {
+                        navController.navigate("coin_flip")
+                    },
                 )
             }
             composable("lucky_draw") {
                 LuckyDrawScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
+            composable("coin_flip") {
+                CoinFlipScreen(
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -122,6 +133,7 @@ enum class AppDestinations(
 @Composable
 fun RandomScreen(
     onLuckyDrawClick: () -> Unit,
+    onCoinFlipClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val randomizerItems =
@@ -136,7 +148,7 @@ fun RandomScreen(
                 imageRes = R.drawable.random_pot,
                 title = "Coin Flip",
                 description = "Classic heads or tails decision maker",
-                onClick = { /* TODO: Implement coin flip */ },
+                onClick = onCoinFlipClick,
             ),
             RandomizerItemData(
                 imageRes = R.drawable.random_pot,
