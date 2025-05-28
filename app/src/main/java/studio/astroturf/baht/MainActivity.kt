@@ -24,6 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
 
@@ -63,9 +67,35 @@ fun BahtApp() {
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             when (currentDestination) {
-                AppDestinations.RANDOM -> RandomScreen(modifier = Modifier.padding(innerPadding))
+                AppDestinations.RANDOM -> RandomNavigation(modifier = Modifier.padding(innerPadding))
                 AppDestinations.TOURNAMENTS -> TournamentsScreen(modifier = Modifier.padding(innerPadding))
             }
+        }
+    }
+}
+
+@Composable
+fun RandomNavigation(modifier: Modifier = Modifier) {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = "random_home",
+        modifier = modifier,
+    ) {
+        composable("random_home") {
+            RandomScreen(
+                onLuckyDrawClick = {
+                    navController.navigate("lucky_draw")
+                },
+            )
+        }
+        composable("lucky_draw") {
+            LuckyDrawScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
         }
     }
 }
@@ -79,28 +109,35 @@ enum class AppDestinations(
 }
 
 @Composable
-fun RandomScreen(modifier: Modifier = Modifier) {
+fun RandomScreen(
+    onLuckyDrawClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val randomizerItems =
         listOf(
             RandomizerItemData(
                 imageRes = R.drawable.random_pot,
                 title = "Lucky Draw",
                 description = "Draw random items from your custom list",
+                onClick = onLuckyDrawClick,
             ),
             RandomizerItemData(
                 imageRes = R.drawable.random_pot,
                 title = "Coin Flip",
                 description = "Classic heads or tails decision maker",
+                onClick = { /* TODO: Implement coin flip */ },
             ),
             RandomizerItemData(
                 imageRes = R.drawable.random_pot,
                 title = "Dice Roll",
                 description = "Roll dice for games and decisions",
+                onClick = { /* TODO: Implement dice roll */ },
             ),
             RandomizerItemData(
                 imageRes = R.drawable.random_pot,
                 title = "Number Generator",
                 description = "Generate random numbers in any range",
+                onClick = { /* TODO: Implement number generator */ },
             ),
         )
 
@@ -112,9 +149,7 @@ fun RandomScreen(modifier: Modifier = Modifier) {
                 imageRes = item.imageRes,
                 title = item.title,
                 description = item.description,
-                onClick = {
-                    // Handle click for each item
-                },
+                onClick = item.onClick,
             )
         }
     }
@@ -124,6 +159,7 @@ data class RandomizerItemData(
     val imageRes: Int,
     val title: String,
     val description: String,
+    val onClick: () -> Unit,
 )
 
 @Composable
