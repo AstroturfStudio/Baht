@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -40,7 +39,7 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun BahtApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
+    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.RANDOM) }
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -49,21 +48,21 @@ fun BahtApp() {
                     icon = {
                         Icon(
                             it.icon,
-                            contentDescription = it.label
+                            contentDescription = it.label,
                         )
                     },
                     label = { Text(it.label) },
                     selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    onClick = { currentDestination = it },
                 )
             }
-        }
+        },
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+            when (currentDestination) {
+                AppDestinations.RANDOM -> RandomScreen(modifier = Modifier.padding(innerPadding))
+                AppDestinations.TOURNAMENTS -> TournamentsScreen(modifier = Modifier.padding(innerPadding))
+            }
         }
     }
 }
@@ -72,15 +71,34 @@ enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
-    HOME("Home", Icons.Default.Casino),
-    TOURNAMENTS("Favorites", Icons.Default.EmojiEvents),
+    RANDOM("Random", Icons.Default.Casino),
+    TOURNAMENTS("Tournaments", Icons.Default.EmojiEvents),
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
+fun RandomScreen(modifier: Modifier = Modifier) {
+    Text(
+        text = "Home Screen",
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun TournamentsScreen(modifier: Modifier = Modifier) {
+    Text(
+        text = "Tournaments Screen",
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun Greeting(
+    name: String,
+    modifier: Modifier = Modifier,
+) {
     Text(
         text = "Hello $name!",
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
