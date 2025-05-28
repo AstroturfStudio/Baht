@@ -86,8 +86,8 @@ fun RandomizerItem(
                     Modifier
                         .height(32.dp)
                         .background(color = Color(0xFF3D99F5), shape = RoundedCornerShape(size = 12.dp))
-                        .padding(start = 16.dp, end = 16.dp)
-                        .clickable { onClick() },
+                        .clickable { onClick() }
+                        .padding(start = 16.dp, end = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
