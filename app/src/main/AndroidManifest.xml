@@ -14,10 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Baht" >
         
-        <!-- AdMob App ID (Test ID for development) -->
+        <!-- AdMob App ID (Production ID for release) -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-6439815249309596~5479152807"/>
         
         <activity
             android:name=".MainActivity"

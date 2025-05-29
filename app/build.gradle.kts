@@ -18,10 +18,44 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            // These will be set via environment variables or gradle.properties
+            // For security, don't commit actual values
+            val storeFile = project.findProperty("RELEASE_STORE_FILE") as String?
+            val storePassword = project.findProperty("RELEASE_STORE_PASSWORD") as String?
+            val keyAlias = project.findProperty("RELEASE_KEY_ALIAS") as String?
+            val keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String?
+
+            if (storeFile != null && file(storeFile).exists()) {
+                this.storeFile = file(storeFile)
+                this.storePassword = storePassword ?: ""
+                this.keyAlias = keyAlias ?: ""
+                this.keyPassword = keyPassword ?: ""
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+            // Only apply signing config if keystore exists
+            val releaseSigningConfig = signingConfigs.getByName("release")
+            if (releaseSigningConfig.storeFile?.exists() == true) {
+                signingConfig = releaseSigningConfig
+            }
+
+            // Optimize for Play Store
+            isDebuggable = false
+            isJniDebuggable = false
+            isPseudoLocalesEnabled = false
+        }
+        debug {
+            isMinifyEnabled = false
+            isDebuggable = true
         }
     }
     compileOptions {
