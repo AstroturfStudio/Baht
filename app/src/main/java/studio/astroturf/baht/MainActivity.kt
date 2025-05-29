@@ -41,6 +41,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -85,7 +88,13 @@ fun BahtApp() {
                             contentDescription = it.label,
                         )
                     },
-                    label = { Text(it.label) },
+                    label = {
+                        Text(
+                            text = it.label,
+                            fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+                            fontWeight = FontWeight.Medium,
+                        )
+                    },
                     selected = it == currentDestination,
                     onClick = { currentDestination = it },
                 )
@@ -306,7 +315,12 @@ fun RandomScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search games...") },
+                placeholder = {
+                    Text(
+                        "Search games...",
+                        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         Icons.Default.Search,
@@ -427,6 +441,8 @@ data class RandomizerItemData(
 fun TournamentsScreen(modifier: Modifier = Modifier) {
     Text(
         text = "Tournaments Screen",
+        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+        fontWeight = FontWeight.Medium,
         modifier = modifier,
     )
 }
