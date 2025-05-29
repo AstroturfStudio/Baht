@@ -44,6 +44,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -137,31 +138,53 @@ fun PasswordGeneratorScreen(onBackClick: () -> Unit) {
                     Spacer(modifier = Modifier.height(20.dp))
 
                     // Password Length
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = Color(0xFF3D99F5).copy(alpha = 0.05f),
+                            ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                         ) {
-                            Text(
-                                text = "Length",
-                                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
-                                fontWeight = FontWeight.Medium,
-                            )
-                            Text(
-                                text = passwordLength.toInt().toString(),
-                                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF3D99F5),
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Text(
+                                    text = "Length",
+                                    fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color(0xFF3D99F5),
+                                )
+                                Text(
+                                    text = passwordLength.toInt().toString(),
+                                    fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF3D99F5),
+                                    fontSize = 16.sp,
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Slider(
+                                value = passwordLength,
+                                onValueChange = { passwordLength = it },
+                                valueRange = 4f..128f,
+                                steps = 124,
+                                colors =
+                                    SliderDefaults.colors(
+                                        thumbColor = Color(0xFF3D99F5),
+                                        activeTrackColor = Color(0xFF3D99F5),
+                                        inactiveTrackColor = Color(0xFFE0E0E0),
+                                        activeTickColor = Color.Transparent,
+                                        inactiveTickColor = Color.Transparent,
+                                    ),
                             )
                         }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Slider(
-                            value = passwordLength,
-                            onValueChange = { passwordLength = it },
-                            valueRange = 4f..128f,
-                            steps = 124,
-                        )
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
