@@ -55,6 +55,7 @@ import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
 import studio.astroturf.baht.ui.passwordGenerator.PasswordGeneratorScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
+import studio.astroturf.baht.ui.tournament.TournamentScreen
 import studio.astroturf.baht.ui.weightedRandom.WeightedRandomScreen
 import studio.astroturf.baht.ui.weightedWheelOfFortune.WeightedWheelOfFortuneScreen
 import studio.astroturf.baht.ui.wheelOfFortune.WheelOfFortuneScreen
@@ -160,6 +161,9 @@ fun RandomNavigation(
                 onListShufflerClick = {
                     navController.navigate("list_shuffler")
                 },
+                onTournamentClick = {
+                    navController.navigate("tournament")
+                },
             )
         }
         composable("lucky_draw") {
@@ -232,6 +236,13 @@ fun RandomNavigation(
                 },
             )
         }
+        composable("tournament") {
+            TournamentScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
     }
 }
 
@@ -247,6 +258,7 @@ fun RandomScreen(
     onPasswordGeneratorClick: () -> Unit,
     onListSplitterClick: () -> Unit,
     onListShufflerClick: () -> Unit,
+    onTournamentClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -312,6 +324,12 @@ fun RandomScreen(
                 title = "List Shuffler",
                 description = "Shuffle your list randomly",
                 onClick = onListShufflerClick,
+            ),
+            RandomizerItemData(
+                imageRes = R.drawable.random_pot,
+                title = "Tournament",
+                description = "Organize single or double elimination tournaments",
+                onClick = onTournamentClick,
             ),
         )
 
