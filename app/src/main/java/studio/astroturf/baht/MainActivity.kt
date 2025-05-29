@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import studio.astroturf.baht.ads.AdManager
+import studio.astroturf.baht.ads.BannerAdView
 import studio.astroturf.baht.ui.coinFlip.CoinFlipScreen
 import studio.astroturf.baht.ui.diceRoll.DiceRollScreen
 import studio.astroturf.baht.ui.listShuffler.ListShufflerScreen
@@ -61,6 +63,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Initialize AdMob
+        AdManager.initialize(this)
+
         setContent {
             BahtTheme {
                 BahtApp()
@@ -75,10 +81,14 @@ fun BahtApp() {
     val randomNavController = rememberNavController()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        RandomNavigation(
-            navController = randomNavController,
-            modifier = Modifier.padding(innerPadding),
-        )
+        Column(modifier = Modifier.padding(innerPadding)) {
+            RandomNavigation(
+                navController = randomNavController,
+                modifier = Modifier.weight(1f),
+            )
+            // Banner ad at bottom
+            BannerAdView()
+        }
     }
 }
 
@@ -87,6 +97,8 @@ fun RandomNavigation(
     navController: androidx.navigation.NavHostController,
     modifier: Modifier = Modifier,
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+
     NavHost(
         navController = navController,
         startDestination = "random_home",
@@ -119,33 +131,43 @@ fun RandomNavigation(
         composable("random_home") {
             RandomScreen(
                 onLuckyDrawClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("lucky_draw")
                 },
                 onCoinFlipClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("coin_flip")
                 },
                 onDiceRollClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("dice_roll")
                 },
                 onNumberGeneratorClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("number_generator")
                 },
                 onWeightedRandomClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("weighted_random")
                 },
                 onWheelOfFortuneClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("wheel_of_fortune")
                 },
                 onWeightedWheelOfFortuneClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("weighted_wheel_of_fortune")
                 },
                 onPasswordGeneratorClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("password_generator")
                 },
                 onListSplitterClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("list_splitter")
                 },
                 onListShufflerClick = {
+                    AdManager.showInterstitialAd(context)
                     navController.navigate("list_shuffler")
                 },
             )
