@@ -284,13 +284,13 @@ fun RandomScreen(
                 onClick = onWeightedRandomClick,
             ),
             RandomizerItemData(
-                imageRes = R.drawable.wheel_icon,
+                imageRes = R.drawable.random_pot,
                 title = "Wheel of Fortune",
                 description = "Spin the wheel to select from custom options",
                 onClick = onWheelOfFortuneClick,
             ),
             RandomizerItemData(
-                imageRes = R.drawable.weighted_wheel_icon,
+                imageRes = R.drawable.random_pot,
                 title = "Weighted Wheel",
                 description = "Spin a wheel where items have different probabilities",
                 onClick = onWeightedWheelOfFortuneClick,
