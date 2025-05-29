@@ -7,7 +7,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -53,6 +51,7 @@ import studio.astroturf.baht.ui.listSplitter.ListSplitterScreen
 import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
 import studio.astroturf.baht.ui.passwordGenerator.PasswordGeneratorScreen
+import studio.astroturf.baht.ui.randomizer.PremiumRandomizerItem
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
 import studio.astroturf.baht.ui.tournament.TournamentScreen
@@ -161,8 +160,8 @@ fun RandomNavigation(
                 onListShufflerClick = {
                     navController.navigate("list_shuffler")
                 },
-                onTournamentClick = {
-                    navController.navigate("tournament")
+                onTournamentsClick = {
+                    navController.navigate("tournaments")
                 },
             )
         }
@@ -236,7 +235,7 @@ fun RandomNavigation(
                 },
             )
         }
-        composable("tournament") {
+        composable("tournaments") {
             TournamentScreen(
                 onBackClick = {
                     navController.popBackStack()
@@ -258,7 +257,7 @@ fun RandomScreen(
     onPasswordGeneratorClick: () -> Unit,
     onListSplitterClick: () -> Unit,
     onListShufflerClick: () -> Unit,
-    onTournamentClick: () -> Unit,
+    onTournamentsClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -325,16 +324,30 @@ fun RandomScreen(
                 description = "Shuffle your list randomly",
                 onClick = onListShufflerClick,
             ),
-            RandomizerItemData(
+        )
+
+    val premiumItems =
+        listOf(
+            PremiumItemData(
                 imageRes = R.drawable.random_pot,
-                title = "Tournament",
+                title = "Tournaments",
                 description = "Organize single or double elimination tournaments",
-                onClick = onTournamentClick,
+                onClick = onTournamentsClick,
             ),
         )
 
     val filteredItems =
         randomizerItems.filter { item ->
+            if (searchQuery.isBlank()) {
+                true
+            } else {
+                item.title.contains(searchQuery, ignoreCase = true) ||
+                    item.description.contains(searchQuery, ignoreCase = true)
+            }
+        }
+
+    val filteredPremiumItems =
+        premiumItems.filter { item ->
             if (searchQuery.isBlank()) {
                 true
             } else {
@@ -386,6 +399,44 @@ fun RandomScreen(
                 state = listState,
                 modifier = Modifier.fillMaxSize(),
             ) {
+                // Premium Features Section
+                if (filteredPremiumItems.isNotEmpty()) {
+                    items(filteredPremiumItems.size) { index ->
+                        PremiumRandomizerItem(
+                            imageRes = filteredPremiumItems[index].imageRes,
+                            title = filteredPremiumItems[index].title,
+                            description = filteredPremiumItems[index].description,
+                            onClick = filteredPremiumItems[index].onClick,
+                        )
+
+                        if (index < filteredPremiumItems.size - 1) {
+                            HorizontalDivider(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp),
+                                thickness = 1.dp,
+                                color = Color(0xFFE8EBF0),
+                            )
+                        }
+                    }
+
+                    // Add divider between premium and regular features if both exist
+                    if (filteredItems.isNotEmpty()) {
+                        item {
+                            HorizontalDivider(
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 24.dp, vertical = 8.dp),
+                                thickness = 1.dp,
+                                color = Color(0xFFE8EBF0),
+                            )
+                        }
+                    }
+                }
+
+                // Regular (Free) Features
                 items(filteredItems.size) { index ->
                     RandomizerItem(
                         imageRes = filteredItems[index].imageRes,
@@ -467,6 +518,13 @@ fun RandomScreen(
 }
 
 data class RandomizerItemData(
+    val imageRes: Int,
+    val title: String,
+    val description: String,
+    val onClick: () -> Unit,
+)
+
+data class PremiumItemData(
     val imageRes: Int,
     val title: String,
     val description: String,
