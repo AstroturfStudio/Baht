@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -39,6 +40,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -75,6 +78,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import studio.astroturf.baht.R
+import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,8 +89,9 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
     var editingIndex by remember { mutableIntStateOf(-1) }
     var editingText by remember { mutableStateOf("") }
     var isDrawing by remember { mutableStateOf(false) }
-    var winner by remember { mutableStateOf<String?>(null) }
-    var showWinner by remember { mutableStateOf(false) }
+    var winners by remember { mutableStateOf(listOf<String>()) }
+    var showWinners by remember { mutableStateOf(false) }
+    var numberOfWinners by remember { mutableIntStateOf(1) }
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
@@ -152,12 +157,21 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             if (entrants.isNotEmpty()) {
+                // Number of winners selector
+                NumberOfWinnersSelector(
+                    numberOfWinners = numberOfWinners,
+                    maxWinners = entrants.size,
+                    onNumberChange = { numberOfWinners = it },
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Button(
                     onClick = {
                         if (!isDrawing && entrants.isNotEmpty()) {
                             isDrawing = true
-                            winner = null
-                            showWinner = false
+                            winners = emptyList()
+                            showWinners = false
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -167,21 +181,21 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
                             containerColor = Color(0xFF3D99F5),
                         ),
                 ) {
-                    DrawButton(isDrawing = isDrawing)
+                    DrawButton(isDrawing = isDrawing, numberOfWinners = numberOfWinners)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
             AnimatedVisibility(
-                visible = showWinner && winner != null,
+                visible = showWinners && winners.isNotEmpty(),
                 enter = scaleIn() + fadeIn(),
                 exit = scaleOut() + fadeOut(),
             ) {
-                WinnerCard(winner = winner ?: "")
+                WinnersCard(winners = winners)
             }
 
-            if (showWinner) {
+            if (showWinners) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
@@ -218,6 +232,9 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
                                     entrants.toMutableList().apply {
                                         removeAt(index)
                                     }
+                                // Adjust number of winners if necessary
+                                numberOfWinners = min(numberOfWinners, entrants.size - 1)
+                                if (numberOfWinners < 1) numberOfWinners = 1
                             },
                         )
                     }
@@ -243,15 +260,112 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
     LaunchedEffect(isDrawing) {
         if (isDrawing && entrants.isNotEmpty()) {
             delay(2000) // Drawing animation duration
-            winner = entrants.random()
+            val actualNumberOfWinners = min(numberOfWinners, entrants.size)
+            winners = entrants.shuffled().take(actualNumberOfWinners)
             isDrawing = false
-            showWinner = true
+            showWinners = true
         }
     }
 }
 
 @Composable
-fun DrawButton(isDrawing: Boolean) {
+fun NumberOfWinnersSelector(
+    numberOfWinners: Int,
+    maxWinners: Int,
+    onNumberChange: (Int) -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Number of Winners:",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF121417),
+                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                IconButton(
+                    onClick = {
+                        if (numberOfWinners > 1) onNumberChange(numberOfWinners - 1)
+                    },
+                    enabled = numberOfWinners > 1,
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .background(
+                                if (numberOfWinners > 1) Color(0xFF3D99F5) else Color(0xFFE0E0E0),
+                                CircleShape,
+                            ),
+                ) {
+                    Icon(
+                        Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Decrease",
+                        tint = if (numberOfWinners > 1) Color.White else Color(0xFF999999),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+
+                Box(
+                    modifier =
+                        Modifier
+                            .background(Color.White, RoundedCornerShape(8.dp))
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = numberOfWinners.toString(),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF121417),
+                        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        if (numberOfWinners < maxWinners) onNumberChange(numberOfWinners + 1)
+                    },
+                    enabled = numberOfWinners < maxWinners,
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .background(
+                                if (numberOfWinners < maxWinners) Color(0xFF3D99F5) else Color(0xFFE0E0E0),
+                                CircleShape,
+                            ),
+                ) {
+                    Icon(
+                        Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "Increase",
+                        tint = if (numberOfWinners < maxWinners) Color.White else Color(0xFF999999),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun DrawButton(
+    isDrawing: Boolean,
+    numberOfWinners: Int,
+) {
     val infiniteTransition = rememberInfiniteTransition(label = "drawAnimation")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -285,8 +399,15 @@ fun DrawButton(isDrawing: Boolean) {
 
         Spacer(modifier = Modifier.width(8.dp))
 
+        val buttonText =
+            if (isDrawing) {
+                "Drawing..."
+            } else {
+                if (numberOfWinners == 1) "Draw Winner!" else "Draw $numberOfWinners Winners!"
+            }
+
         Text(
-            text = if (isDrawing) "Drawing..." else "Draw Winner!",
+            text = buttonText,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
@@ -295,7 +416,7 @@ fun DrawButton(isDrawing: Boolean) {
 }
 
 @Composable
-fun WinnerCard(winner: String) {
+fun WinnersCard(winners: List<String>) {
     val infiniteTransition = rememberInfiniteTransition(label = "winnerGlow")
     val glow by infiniteTransition.animateFloat(
         initialValue = 0.7f,
@@ -331,21 +452,44 @@ fun WinnerCard(winner: String) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "🎉 WINNER! 🎉",
+                text = if (winners.size == 1) "🎉 WINNER! 🎉" else "🎉 WINNERS! 🎉",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = winner,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
-            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                winners.forEachIndexed { index, winner ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        if (winners.size > 1) {
+                            Text(
+                                text = "${index + 1}.",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        Text(
+                            text = winner,
+                            fontSize = if (winners.size == 1) 24.sp else 20.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -508,4 +652,4 @@ fun EntrantItem(
             }
         }
     }
-} 
+}
