@@ -54,6 +54,8 @@ import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
 import studio.astroturf.baht.ui.weightedRandom.WeightedRandomScreen
+import studio.astroturf.baht.ui.weightedWheelOfFortune.WeightedWheelOfFortuneScreen
+import studio.astroturf.baht.ui.wheelOfFortune.WheelOfFortuneScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -158,6 +160,12 @@ fun RandomNavigation(
                     onWeightedRandomClick = {
                         navController.navigate("weighted_random")
                     },
+                    onWheelOfFortuneClick = {
+                        navController.navigate("wheel_of_fortune")
+                    },
+                    onWeightedWheelOfFortuneClick = {
+                        navController.navigate("weighted_wheel_of_fortune")
+                    },
                 )
             }
             composable("lucky_draw") {
@@ -195,6 +203,20 @@ fun RandomNavigation(
                     },
                 )
             }
+            composable("wheel_of_fortune") {
+                WheelOfFortuneScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
+            composable("weighted_wheel_of_fortune") {
+                WeightedWheelOfFortuneScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
@@ -214,6 +236,8 @@ fun RandomScreen(
     onDiceRollClick: () -> Unit,
     onNumberGeneratorClick: () -> Unit,
     onWeightedRandomClick: () -> Unit,
+    onWheelOfFortuneClick: () -> Unit,
+    onWeightedWheelOfFortuneClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -249,6 +273,18 @@ fun RandomScreen(
                 title = "Weighted Random",
                 description = "Select winners based on contribution amounts",
                 onClick = onWeightedRandomClick,
+            ),
+            RandomizerItemData(
+                imageRes = R.drawable.wheel_icon,
+                title = "Wheel of Fortune",
+                description = "Spin the wheel to select from custom options",
+                onClick = onWheelOfFortuneClick,
+            ),
+            RandomizerItemData(
+                imageRes = R.drawable.weighted_wheel_icon,
+                title = "Weighted Wheel",
+                description = "Spin a wheel where items have different probabilities",
+                onClick = onWeightedWheelOfFortuneClick,
             ),
         )
 

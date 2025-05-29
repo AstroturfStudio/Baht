@@ -1,0 +1,56 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Wheel Background -->
+    <path
+        android:fillColor="#FFE53E3E"
+        android:pathData="M100,100 L100,0 A100,100 0 0,1 171.01,14.64 Z"/>
+    
+    <path
+        android:fillColor="#FF3182CE"
+        android:pathData="M100,100 L171.01,14.64 A100,100 0 0,1 198.48,76.54 Z"/>
+    
+    <path
+        android:fillColor="#FF38A169"
+        android:pathData="M100,100 L198.48,76.54 A100,100 0 0,1 171.01,185.36 Z"/>
+    
+    <path
+        android:fillColor="#FFD69E2E"
+        android:pathData="M100,100 L171.01,185.36 A100,100 0 0,1 28.99,185.36 Z"/>
+    
+    <path
+        android:fillColor="#FF805AD5"
+        android:pathData="M100,100 L28.99,185.36 A100,100 0 0,1 1.52,123.46 Z"/>
+    
+    <path
+        android:fillColor="#FFDD6B20"
+        android:pathData="M100,100 L1.52,123.46 A100,100 0 0,1 1.52,76.54 Z"/>
+    
+    <path
+        android:fillColor="#FF319795"
+        android:pathData="M100,100 L1.52,76.54 A100,100 0 0,1 28.99,14.64 Z"/>
+    
+    <path
+        android:fillColor="#FFE53E3E"
+        android:pathData="M100,100 L28.99,14.64 A100,100 0 0,1 100,0 Z"/>
+    
+    <!-- Wheel Border -->
+    <path
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M100,100 m-100,0 a100,100 0 1,1 200,0 a100,100 0 1,1 -200,0"/>
+    
+    <!-- Center Circle -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M100,100 m-15,0 a15,15 0 1,1 30,0 a15,15 0 1,1 -30,0"/>
+    
+    <!-- Pointer -->
+    <path
+        android:fillColor="#FFFF0000"
+        android:pathData="M100,10 L90,30 L110,30 Z"/>
+</vector> 

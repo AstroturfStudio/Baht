@@ -1,0 +1,38 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    
+    <!-- Large segment (50%) -->
+    <path
+        android:fillColor="#FF4CAF50"
+        android:pathData="M100,100 L100,0 A100,100 0 0,1 200,100 Z"/>
+    
+    <!-- Medium segment (30%) -->
+    <path
+        android:fillColor="#FFFF9800"
+        android:pathData="M100,100 L200,100 A100,100 0 0,1 130.9,190.9 Z"/>
+    
+    <!-- Small segment (20%) -->
+    <path
+        android:fillColor="#FF2196F3"
+        android:pathData="M100,100 L130.9,190.9 A100,100 0 0,1 100,0 Z"/>
+    
+    <!-- Wheel Border -->
+    <path
+        android:strokeColor="#FF000000"
+        android:strokeWidth="4"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M100,100 m-100,0 a100,100 0 1,1 200,0 a100,100 0 1,1 -200,0"/>
+    
+    <!-- Center Circle -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M100,100 m-15,0 a15,15 0 1,1 30,0 a15,15 0 1,1 -30,0"/>
+    
+    <!-- Pointer -->
+    <path
+        android:fillColor="#FFFF0000"
+        android:pathData="M100,10 L90,30 L110,30 Z"/>
+</vector> 
