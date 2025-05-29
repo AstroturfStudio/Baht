@@ -52,6 +52,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import studio.astroturf.baht.ui.coinFlip.CoinFlipScreen
 import studio.astroturf.baht.ui.diceRoll.DiceRollScreen
+import studio.astroturf.baht.ui.listShuffler.ListShufflerScreen
 import studio.astroturf.baht.ui.listSplitter.ListSplitterScreen
 import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
@@ -183,6 +184,9 @@ fun RandomNavigation(
                     onListSplitterClick = {
                         navController.navigate("list_splitter")
                     },
+                    onListShufflerClick = {
+                        navController.navigate("list_shuffler")
+                    },
                 )
             }
             composable("lucky_draw") {
@@ -248,6 +252,13 @@ fun RandomNavigation(
                     },
                 )
             }
+            composable("list_shuffler") {
+                ListShufflerScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
@@ -271,6 +282,7 @@ fun RandomScreen(
     onWeightedWheelOfFortuneClick: () -> Unit,
     onPasswordGeneratorClick: () -> Unit,
     onListSplitterClick: () -> Unit,
+    onListShufflerClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -330,6 +342,12 @@ fun RandomScreen(
                 title = "List Splitter",
                 description = "Split your list into equal groups randomly",
                 onClick = onListSplitterClick,
+            ),
+            RandomizerItemData(
+                imageRes = R.drawable.random_pot,
+                title = "List Shuffler",
+                description = "Shuffle your list randomly",
+                onClick = onListShufflerClick,
             ),
         )
 
