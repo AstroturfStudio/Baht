@@ -58,6 +58,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -68,6 +69,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import studio.astroturf.baht.R
+import studio.astroturf.baht.ads.AdManager
 import kotlin.random.Random
 
 enum class NumberType {
@@ -78,6 +80,7 @@ enum class NumberType {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NumberGeneratorScreen(onBackClick: () -> Unit) {
+    val context = LocalContext.current
     var minValue by remember { mutableStateOf("1") }
     var maxValue by remember { mutableStateOf("100") }
     var quantity by remember { mutableStateOf("1") }
@@ -314,6 +317,7 @@ fun NumberGeneratorScreen(onBackClick: () -> Unit) {
             generatedNumbers = generateNumbers(minValue, maxValue, quantity, numberType)
             isGenerating = false
             showResult = true
+            AdManager.showInterstitialAd(context)
         }
     }
 }
@@ -616,4 +620,4 @@ private fun generateAnimationNumbers(
                 String.format("%.2f", randomDouble)
             }
         }
-    } 
+    }

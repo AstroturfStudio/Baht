@@ -68,6 +68,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -78,11 +79,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import studio.astroturf.baht.R
+import studio.astroturf.baht.ads.AdManager
 import kotlin.math.min
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LuckyDrawScreen(onBackClick: () -> Unit) {
+    val context = LocalContext.current
     var entrants by remember { mutableStateOf(listOf<String>()) }
     var newEntrantName by remember { mutableStateOf("") }
     var isAddingEntrant by remember { mutableStateOf(false) }
@@ -264,6 +267,7 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
             winners = entrants.shuffled().take(actualNumberOfWinners)
             isDrawing = false
             showWinners = true
+            AdManager.showInterstitialAd(context)
         }
     }
 }

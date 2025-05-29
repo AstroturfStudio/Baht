@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -59,11 +60,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import studio.astroturf.baht.R
+import studio.astroturf.baht.ads.AdManager
 import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiceRollScreen(onBackClick: () -> Unit) {
+    val context = LocalContext.current
     var numberOfDice by remember { mutableIntStateOf(1) }
     var isRolling by remember { mutableStateOf(false) }
     var diceResults by remember { mutableStateOf(listOf<Int>()) }
@@ -183,6 +186,7 @@ fun DiceRollScreen(onBackClick: () -> Unit) {
             diceResults = (1..numberOfDice).map { Random.nextInt(1, 7) }
             isRolling = false
             showResults = true
+            AdManager.showInterstitialAd(context)
         }
     }
 }
@@ -468,4 +472,4 @@ private fun getDiceEmoji(value: Int): String =
         5 -> "⚄"
         6 -> "⚅"
         else -> "🎲"
-    } 
+    }

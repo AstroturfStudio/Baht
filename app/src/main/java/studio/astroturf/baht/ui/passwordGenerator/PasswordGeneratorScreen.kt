@@ -62,6 +62,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -72,10 +73,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import studio.astroturf.baht.R
+import studio.astroturf.baht.ads.AdManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordGeneratorScreen(onBackClick: () -> Unit) {
+    val context = LocalContext.current
     var passwordLength by remember { mutableFloatStateOf(12f) }
     var includeUppercase by remember { mutableStateOf(true) }
     var includeLowercase by remember { mutableStateOf(true) }
@@ -332,6 +335,7 @@ fun PasswordGeneratorScreen(onBackClick: () -> Unit) {
                 generatedPassword = password
                 showResult = true
                 isGenerating = false
+                AdManager.showInterstitialAd(context)
             }
         }
     }

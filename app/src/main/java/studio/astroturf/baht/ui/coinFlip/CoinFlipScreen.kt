@@ -51,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -59,10 +60,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import studio.astroturf.baht.R
+import studio.astroturf.baht.ads.AdManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinFlipScreen(onBackClick: () -> Unit) {
+    val context = LocalContext.current
     var isFlipping by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<CoinSide?>(null) }
     var showResult by remember { mutableStateOf(false) }
@@ -143,6 +146,7 @@ fun CoinFlipScreen(onBackClick: () -> Unit) {
             result = if (kotlin.random.Random.nextBoolean()) CoinSide.HEADS else CoinSide.TAILS
             isFlipping = false
             showResult = true
+            AdManager.showInterstitialAd(context)
         }
     }
 }
