@@ -20,9 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -30,20 +28,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
@@ -78,197 +72,155 @@ class MainActivity : ComponentActivity() {
 @PreviewScreenSizes
 @Composable
 fun BahtApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.RANDOM) }
     val randomNavController = rememberNavController()
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label,
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = it.label,
-                            fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
-                            fontWeight = FontWeight.Medium,
-                        )
-                    },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it },
-                )
-            }
-        },
-    ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            // Always render RandomNavigation but control its visibility
-            RandomNavigation(
-                navController = randomNavController,
-                isVisible = currentDestination == AppDestinations.RANDOM,
-                modifier = Modifier.padding(innerPadding),
-            )
-
-            if (currentDestination == AppDestinations.TOURNAMENTS) {
-                TournamentsScreen(modifier = Modifier.padding(innerPadding))
-            }
-        }
+    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        RandomNavigation(
+            navController = randomNavController,
+            modifier = Modifier.padding(innerPadding),
+        )
     }
 }
 
 @Composable
 fun RandomNavigation(
     navController: androidx.navigation.NavHostController,
-    isVisible: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    if (isVisible) {
-        NavHost(
-            navController = navController,
-            startDestination = "random_home",
-            modifier = modifier,
-            enterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { it },
-                    animationSpec = tween(300),
-                )
-            },
-            exitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { -it },
-                    animationSpec = tween(300),
-                )
-            },
-            popEnterTransition = {
-                slideInHorizontally(
-                    initialOffsetX = { -it },
-                    animationSpec = tween(300),
-                )
-            },
-            popExitTransition = {
-                slideOutHorizontally(
-                    targetOffsetX = { it },
-                    animationSpec = tween(300),
-                )
-            },
-        ) {
-            composable("random_home") {
-                RandomScreen(
-                    onLuckyDrawClick = {
-                        navController.navigate("lucky_draw")
-                    },
-                    onCoinFlipClick = {
-                        navController.navigate("coin_flip")
-                    },
-                    onDiceRollClick = {
-                        navController.navigate("dice_roll")
-                    },
-                    onNumberGeneratorClick = {
-                        navController.navigate("number_generator")
-                    },
-                    onWeightedRandomClick = {
-                        navController.navigate("weighted_random")
-                    },
-                    onWheelOfFortuneClick = {
-                        navController.navigate("wheel_of_fortune")
-                    },
-                    onWeightedWheelOfFortuneClick = {
-                        navController.navigate("weighted_wheel_of_fortune")
-                    },
-                    onPasswordGeneratorClick = {
-                        navController.navigate("password_generator")
-                    },
-                    onListSplitterClick = {
-                        navController.navigate("list_splitter")
-                    },
-                    onListShufflerClick = {
-                        navController.navigate("list_shuffler")
-                    },
-                )
-            }
-            composable("lucky_draw") {
-                LuckyDrawScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("coin_flip") {
-                CoinFlipScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("dice_roll") {
-                DiceRollScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("number_generator") {
-                NumberGeneratorScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("weighted_random") {
-                WeightedRandomScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("wheel_of_fortune") {
-                WheelOfFortuneScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("weighted_wheel_of_fortune") {
-                WeightedWheelOfFortuneScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("password_generator") {
-                PasswordGeneratorScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("list_splitter") {
-                ListSplitterScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
-            composable("list_shuffler") {
-                ListShufflerScreen(
-                    onBackClick = {
-                        navController.popBackStack()
-                    },
-                )
-            }
+    NavHost(
+        navController = navController,
+        startDestination = "random_home",
+        modifier = modifier,
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { it },
+                animationSpec = tween(300),
+            )
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { -it },
+                animationSpec = tween(300),
+            )
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(300),
+            )
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(300),
+            )
+        },
+    ) {
+        composable("random_home") {
+            RandomScreen(
+                onLuckyDrawClick = {
+                    navController.navigate("lucky_draw")
+                },
+                onCoinFlipClick = {
+                    navController.navigate("coin_flip")
+                },
+                onDiceRollClick = {
+                    navController.navigate("dice_roll")
+                },
+                onNumberGeneratorClick = {
+                    navController.navigate("number_generator")
+                },
+                onWeightedRandomClick = {
+                    navController.navigate("weighted_random")
+                },
+                onWheelOfFortuneClick = {
+                    navController.navigate("wheel_of_fortune")
+                },
+                onWeightedWheelOfFortuneClick = {
+                    navController.navigate("weighted_wheel_of_fortune")
+                },
+                onPasswordGeneratorClick = {
+                    navController.navigate("password_generator")
+                },
+                onListSplitterClick = {
+                    navController.navigate("list_splitter")
+                },
+                onListShufflerClick = {
+                    navController.navigate("list_shuffler")
+                },
+            )
+        }
+        composable("lucky_draw") {
+            LuckyDrawScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("coin_flip") {
+            CoinFlipScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("dice_roll") {
+            DiceRollScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("number_generator") {
+            NumberGeneratorScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("weighted_random") {
+            WeightedRandomScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("wheel_of_fortune") {
+            WheelOfFortuneScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("weighted_wheel_of_fortune") {
+            WeightedWheelOfFortuneScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("password_generator") {
+            PasswordGeneratorScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("list_splitter") {
+            ListSplitterScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
+        composable("list_shuffler") {
+            ListShufflerScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
         }
     }
-}
-
-enum class AppDestinations(
-    val label: String,
-    val icon: ImageVector,
-) {
-    RANDOM("Random", Icons.Default.Casino),
-    TOURNAMENTS("Tournaments", Icons.Default.EmojiEvents),
 }
 
 @Composable
@@ -490,16 +442,6 @@ data class RandomizerItemData(
     val description: String,
     val onClick: () -> Unit,
 )
-
-@Composable
-fun TournamentsScreen(modifier: Modifier = Modifier) {
-    Text(
-        text = "Tournaments Screen",
-        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
-        fontWeight = FontWeight.Medium,
-        modifier = modifier,
-    )
-}
 
 @Composable
 fun Greeting(
