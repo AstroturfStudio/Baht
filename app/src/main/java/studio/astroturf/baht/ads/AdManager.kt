@@ -11,19 +11,20 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
 object AdManager {
-    // Set this to true for testing, false for production
-    private const val USE_TEST_ADS = true
+    // Detect debug mode by checking if debuggable flag is set
+    private fun isDebugMode(context: Context): Boolean =
+        (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     // Use test ads in debug, real ads in release
-    val BANNER_AD_UNIT_ID =
-        if (USE_TEST_ADS) {
+    private fun getBannerAdUnitId(context: Context): String =
+        if (isDebugMode(context)) {
             "ca-app-pub-3940256099942544/6300978111" // Test ID
         } else {
             "ca-app-pub-6439815249309596/9853512088" // Real ID
         }
 
-    val INTERSTITIAL_AD_UNIT_ID =
-        if (USE_TEST_ADS) {
+    private fun getInterstitialAdUnitId(context: Context): String =
+        if (isDebugMode(context)) {
             "ca-app-pub-3940256099942544/1033173712" // Test ID
         } else {
             "ca-app-pub-6439815249309596/3136060494" // Real ID
@@ -51,7 +52,7 @@ object AdManager {
 
         InterstitialAd.load(
             context,
-            INTERSTITIAL_AD_UNIT_ID,
+            getInterstitialAdUnitId(context),
             adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
@@ -96,7 +97,7 @@ object AdManager {
     fun createBannerAdView(context: Context): AdView =
         AdView(context).apply {
             setAdSize(com.google.android.gms.ads.AdSize.BANNER)
-            adUnitId = BANNER_AD_UNIT_ID
+            adUnitId = getBannerAdUnitId(context)
             loadAd(AdRequest.Builder().build())
         }
-} 
+}
