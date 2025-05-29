@@ -52,6 +52,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import studio.astroturf.baht.ui.coinFlip.CoinFlipScreen
 import studio.astroturf.baht.ui.diceRoll.DiceRollScreen
+import studio.astroturf.baht.ui.listSplitter.ListSplitterScreen
 import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
 import studio.astroturf.baht.ui.passwordGenerator.PasswordGeneratorScreen
@@ -179,6 +180,9 @@ fun RandomNavigation(
                     onPasswordGeneratorClick = {
                         navController.navigate("password_generator")
                     },
+                    onListSplitterClick = {
+                        navController.navigate("list_splitter")
+                    },
                 )
             }
             composable("lucky_draw") {
@@ -237,6 +241,13 @@ fun RandomNavigation(
                     },
                 )
             }
+            composable("list_splitter") {
+                ListSplitterScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
@@ -259,6 +270,7 @@ fun RandomScreen(
     onWheelOfFortuneClick: () -> Unit,
     onWeightedWheelOfFortuneClick: () -> Unit,
     onPasswordGeneratorClick: () -> Unit,
+    onListSplitterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -312,6 +324,12 @@ fun RandomScreen(
                 title = "Password Generator",
                 description = "Generate secure passwords with custom settings",
                 onClick = onPasswordGeneratorClick,
+            ),
+            RandomizerItemData(
+                imageRes = R.drawable.random_pot,
+                title = "List Splitter",
+                description = "Split your list into equal groups randomly",
+                onClick = onListSplitterClick,
             ),
         )
 
