@@ -67,7 +67,7 @@ fun RandomizerItem(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = description,
@@ -79,6 +79,7 @@ fun RandomizerItem(
                         fontWeight = FontWeight(400),
                         color = Color(0xFF61758A),
                     ),
+                modifier = Modifier.weight(1f).padding(end = 12.dp),
             )
 
             Row(
