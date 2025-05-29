@@ -18,17 +18,23 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -198,6 +204,8 @@ fun RandomScreen(
     onNumberGeneratorClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var searchQuery by remember { mutableStateOf("") }
+
     val randomizerItems =
         listOf(
             RandomizerItemData(
@@ -226,30 +234,72 @@ fun RandomScreen(
             ),
         )
 
+    val filteredItems =
+        randomizerItems.filter { item ->
+            if (searchQuery.isBlank()) {
+                true
+            } else {
+                item.title.contains(searchQuery, ignoreCase = true) ||
+                    item.description.contains(searchQuery, ignoreCase = true)
+            }
+        }
+
     val listState = rememberLazyListState()
 
     Box(modifier = modifier) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            items(randomizerItems.size) { index ->
-                RandomizerItem(
-                    imageRes = randomizerItems[index].imageRes,
-                    title = randomizerItems[index].title,
-                    description = randomizerItems[index].description,
-                    onClick = randomizerItems[index].onClick,
-                )
-
-                if (index < randomizerItems.size - 1) {
-                    HorizontalDivider(
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 24.dp),
-                        thickness = 1.dp,
-                        color = Color(0xFFE8EBF0),
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                placeholder = { Text("Search games...") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Search",
                     )
+                },
+                trailingIcon = {
+                    if (searchQuery.isNotBlank()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(
+                                Icons.Default.Clear,
+                                contentDescription = "Clear search",
+                            )
+                        }
+                    }
+                },
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+            )
+
+            // Games List
+            LazyColumn(
+                state = listState,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                items(filteredItems.size) { index ->
+                    RandomizerItem(
+                        imageRes = filteredItems[index].imageRes,
+                        title = filteredItems[index].title,
+                        description = filteredItems[index].description,
+                        onClick = filteredItems[index].onClick,
+                    )
+
+                    if (index < filteredItems.size - 1) {
+                        HorizontalDivider(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 24.dp),
+                            thickness = 1.dp,
+                            color = Color(0xFFE8EBF0),
+                        )
+                    }
                 }
             }
         }
