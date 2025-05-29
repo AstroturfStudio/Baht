@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import studio.astroturf.baht.ui.coinFlip.CoinFlipScreen
 import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
+import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
 
@@ -93,6 +97,30 @@ fun RandomNavigation(
             navController = navController,
             startDestination = "random_home",
             modifier = modifier,
+            enterTransition = { 
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = { 
+                slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = { 
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = { 
+                slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = tween(300)
+                )
+            },
         ) {
             composable("random_home") {
                 RandomScreen(
@@ -101,6 +129,9 @@ fun RandomNavigation(
                     },
                     onCoinFlipClick = {
                         navController.navigate("coin_flip")
+                    },
+                    onNumberGeneratorClick = {
+                        navController.navigate("number_generator")
                     },
                 )
             }
@@ -113,6 +144,13 @@ fun RandomNavigation(
             }
             composable("coin_flip") {
                 CoinFlipScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
+            composable("number_generator") {
+                NumberGeneratorScreen(
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -134,6 +172,7 @@ enum class AppDestinations(
 fun RandomScreen(
     onLuckyDrawClick: () -> Unit,
     onCoinFlipClick: () -> Unit,
+    onNumberGeneratorClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val randomizerItems =
@@ -160,7 +199,7 @@ fun RandomScreen(
                 imageRes = R.drawable.random_pot,
                 title = "Number Generator",
                 description = "Generate random numbers in any range",
-                onClick = { /* TODO: Implement number generator */ },
+                onClick = onNumberGeneratorClick,
             ),
         )
 
