@@ -17,7 +17,6 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +28,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -49,7 +47,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -92,44 +89,46 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
     var showWinner by remember { mutableStateOf(false) }
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Text(
                         "Lucky Draw",
                         fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                }
+                },
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { isAddingEntrant = true },
-                containerColor = Color(0xFF3D99F5)
+                containerColor = Color(0xFF3D99F5),
             ) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Entrant")
             }
-        }
+        },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .verticalScroll(scrollState)
+                    .padding(16.dp),
         ) {
-            
             AnimatedVisibility(
                 visible = isAddingEntrant,
                 enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
+                exit = shrinkVertically() + fadeOut(),
             ) {
                 AddEntrantCard(
                     value = newEntrantName,
@@ -146,7 +145,7 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
                         newEntrantName = ""
                         isAddingEntrant = false
                         keyboardController?.hide()
-                    }
+                    },
                 )
             }
 
@@ -163,9 +162,10 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
                     },
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !isDrawing && entrants.isNotEmpty(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF3D99F5)
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3D99F5),
+                        ),
                 ) {
                     DrawButton(isDrawing = isDrawing)
                 }
@@ -176,7 +176,7 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
             AnimatedVisibility(
                 visible = showWinner && winner != null,
                 enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut()
+                exit = scaleOut() + fadeOut(),
             ) {
                 WinnerCard(winner = winner ?: "")
             }
@@ -185,54 +185,58 @@ fun LuckyDrawScreen(onBackClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(entrants.indices.toList()) { index ->
-                    EntrantItem(
-                        entrant = entrants[index],
-                        isEditing = editingIndex == index,
-                        editingText = editingText,
-                        onEditingTextChange = { editingText = it },
-                        onEdit = {
-                            editingIndex = index
-                            editingText = entrants[index]
-                        },
-                        onSaveEdit = {
-                            entrants = entrants.toMutableList().apply {
-                                this[index] = editingText
-                            }
-                            editingIndex = -1
-                            editingText = ""
-                            keyboardController?.hide()
-                        },
-                        onCancelEdit = {
-                            editingIndex = -1
-                            editingText = ""
-                            keyboardController?.hide()
-                        },
-                        onDelete = {
-                            entrants = entrants.toMutableList().apply {
-                                removeAt(index)
-                            }
-                        }
-                    )
+            if (entrants.isNotEmpty()) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    entrants.forEachIndexed { index, entrant ->
+                        EntrantItem(
+                            entrant = entrant,
+                            isEditing = editingIndex == index,
+                            editingText = editingText,
+                            onEditingTextChange = { editingText = it },
+                            onEdit = {
+                                editingIndex = index
+                                editingText = entrants[index]
+                            },
+                            onSaveEdit = {
+                                entrants =
+                                    entrants.toMutableList().apply {
+                                        this[index] = editingText
+                                    }
+                                editingIndex = -1
+                                editingText = ""
+                                keyboardController?.hide()
+                            },
+                            onCancelEdit = {
+                                editingIndex = -1
+                                editingText = ""
+                                keyboardController?.hide()
+                            },
+                            onDelete = {
+                                entrants =
+                                    entrants.toMutableList().apply {
+                                        removeAt(index)
+                                    }
+                            },
+                        )
+                    }
                 }
-            }
-
-            if (entrants.isEmpty()) {
+            } else {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         "No entrants yet!\nTap + to add some",
                         textAlign = TextAlign.Center,
                         color = Color(0xFF61758A),
-                        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans))
+                        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 
@@ -252,39 +256,40 @@ fun DrawButton(isDrawing: Boolean) {
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = if (isDrawing) 360f else 0f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "rotation"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(1000, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart,
+            ),
+        label = "rotation",
     )
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
     ) {
         Box(
-            modifier = Modifier
-                .size(24.dp)
-                .rotate(rotation)
-                .background(
-                    if (isDrawing) Color.White.copy(alpha = 0.3f) else Color.Transparent,
-                    CircleShape
-                )
-                .border(
-                    2.dp,
-                    if (isDrawing) Color.White else Color.Transparent,
-                    CircleShape
-                )
+            modifier =
+                Modifier
+                    .size(24.dp)
+                    .rotate(rotation)
+                    .background(
+                        if (isDrawing) Color.White.copy(alpha = 0.3f) else Color.Transparent,
+                        CircleShape,
+                    ).border(
+                        2.dp,
+                        if (isDrawing) Color.White else Color.Transparent,
+                        CircleShape,
+                    ),
         )
-        
+
         Spacer(modifier = Modifier.width(8.dp))
-        
+
         Text(
             text = if (isDrawing) "Drawing..." else "Draw Winner!",
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            fontFamily = FontFamily(Font(R.font.plus_jakarta_sans))
+            fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
         )
     }
 }
@@ -295,38 +300,42 @@ fun WinnerCard(winner: String) {
     val glow by infiniteTransition.animateFloat(
         initialValue = 0.7f,
         targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(1000),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "glow"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(1000),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "glow",
     )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .graphicsLayer {
-                alpha = glow
-                scaleX = 1f + (glow - 0.7f) * 0.1f
-                scaleY = 1f + (glow - 0.7f) * 0.1f
-            },
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF4CAF50)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .graphicsLayer {
+                    alpha = glow
+                    scaleX = 1f + (glow - 0.7f) * 0.1f
+                    scaleY = 1f + (glow - 0.7f) * 0.1f
+                },
+        colors =
+            CardDefaults.cardColors(
+                containerColor = Color(0xFF4CAF50),
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "🎉 WINNER! 🎉",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans))
+                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -335,7 +344,7 @@ fun WinnerCard(winner: String) {
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White,
                 textAlign = TextAlign.Center,
-                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans))
+                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
             )
         }
     }
@@ -346,14 +355,14 @@ fun AddEntrantCard(
     value: String,
     onValueChange: (String) -> Unit,
     onSave: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA)),
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             OutlinedTextField(
                 value = value,
@@ -361,28 +370,30 @@ fun AddEntrantCard(
                 label = { Text("Entrant Name") },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(onDone = { onSave() })
+                keyboardActions = KeyboardActions(onDone = { onSave() }),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
             ) {
                 Button(
                     onClick = onCancel,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = Color(0xFF61758A)
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color(0xFF61758A),
+                        ),
                 ) {
                     Text("Cancel")
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
                     onClick = onSave,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF3D99F5)
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF3D99F5),
+                        ),
                 ) {
                     Text("Add")
                 }
@@ -400,28 +411,30 @@ fun EntrantItem(
     onEdit: () -> Unit,
     onSaveEdit: () -> Unit,
     onCancelEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
 ) {
     val backgroundColor by animateColorAsState(
         targetValue = if (isEditing) Color(0xFFF0F8FF) else Color.White,
         animationSpec = tween(300),
-        label = "backgroundColor"
+        label = "backgroundColor",
     )
 
     val scale by animateFloatAsState(
         targetValue = if (isEditing) 1.02f else 1f,
         animationSpec = tween(300),
-        label = "scale"
+        label = "scale",
     )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .scale(scale),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .scale(scale),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isEditing) 4.dp else 1.dp
-        )
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = if (isEditing) 4.dp else 1.dp,
+            ),
     ) {
         if (isEditing) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -430,28 +443,30 @@ fun EntrantItem(
                     onValueChange = onEditingTextChange,
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onSaveEdit() })
+                    keyboardActions = KeyboardActions(onDone = { onSaveEdit() }),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
                 ) {
                     Button(
                         onClick = onCancelEdit,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = Color(0xFF61758A)
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent,
+                                contentColor = Color(0xFF61758A),
+                            ),
                     ) {
                         Text("Cancel")
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = onSaveEdit,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3D99F5)
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF3D99F5),
+                            ),
                     ) {
                         Text("Save")
                     }
@@ -459,11 +474,12 @@ fun EntrantItem(
             }
         } else {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = entrant,
@@ -471,21 +487,21 @@ fun EntrantItem(
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF121417),
                     fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
                 Row {
                     IconButton(onClick = onEdit) {
                         Icon(
                             Icons.Filled.Edit,
                             contentDescription = "Edit",
-                            tint = Color(0xFF3D99F5)
+                            tint = Color(0xFF3D99F5),
                         )
                     }
                     IconButton(onClick = onDelete) {
                         Icon(
                             Icons.Filled.Delete,
                             contentDescription = "Delete",
-                            tint = Color(0xFFE57373)
+                            tint = Color(0xFFE57373),
                         )
                     }
                 }

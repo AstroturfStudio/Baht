@@ -25,12 +25,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -94,6 +94,7 @@ fun WeightedRandomScreen(onBackClick: () -> Unit) {
     var showWinner by remember { mutableStateOf(false) }
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -126,6 +127,7 @@ fun WeightedRandomScreen(onBackClick: () -> Unit) {
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
+                    .verticalScroll(scrollState)
                     .padding(16.dp),
         ) {
             AnimatedVisibility(
@@ -194,56 +196,67 @@ fun WeightedRandomScreen(onBackClick: () -> Unit) {
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(candidates.indices.toList()) { index ->
-                    CandidateItem(
-                        candidate = candidates[index],
-                        isEditing = editingIndex == index,
-                        editingName = editingName,
-                        editingWeight = editingContribution,
-                        onEditingNameChange = { editingName = it },
-                        onEditingWeightChange = { editingContribution = it },
-                        onEdit = {
-                            editingIndex = index
-                            editingName = candidates[index].name
-                            editingContribution = candidates[index].contribution.toString()
-                        },
-                        onSaveEdit = {
-                            val weight = editingContribution.toDoubleOrNull()
-                            if (editingName.isNotBlank() && weight != null && weight > 0) {
-                                candidates =
-                                    candidates.toMutableList().apply {
-                                        this[index] = WeightedCandidate(editingName, weight)
-                                    }
+            if (candidates.isNotEmpty()) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    candidates.forEachIndexed { index, candidate ->
+                        CandidateItem(
+                            candidate = candidate,
+                            isEditing = editingIndex == index,
+                            editingName = editingName,
+                            editingContribution = editingContribution,
+                            onEditingNameChange = { editingName = it },
+                            onEditingContributionChange = { editingContribution = it },
+                            onEdit = {
+                                editingIndex = index
+                                editingName = candidate.name
+                                editingContribution = candidate.contribution.toString()
+                            },
+                            onSaveEdit = {
+                                val newContribution = editingContribution.toDoubleOrNull()
+                                if (editingName.isNotBlank() && newContribution != null && newContribution > 0) {
+                                    candidates =
+                                        candidates.toMutableList().apply {
+                                            this[index] = WeightedCandidate(editingName, newContribution)
+                                        }
+                                    editingIndex = -1
+                                    editingName = ""
+                                    editingContribution = ""
+                                    keyboardController?.hide()
+                                }
+                            },
+                            onCancelEdit = {
                                 editingIndex = -1
                                 editingName = ""
                                 editingContribution = ""
                                 keyboardController?.hide()
-                            }
-                        },
-                        onCancelEdit = {
-                            editingIndex = -1
-                            editingName = ""
-                            editingContribution = ""
-                            keyboardController?.hide()
-                        },
-                        onDelete = {
-                            candidates =
-                                candidates.toMutableList().apply {
-                                    removeAt(index)
-                                }
-                            if (editingIndex == index) {
-                                editingIndex = -1
-                                editingName = ""
-                                editingContribution = ""
-                            }
-                        },
-                        totalContribution = candidates.sumOf { it.contribution },
+                            },
+                            onDelete = {
+                                candidates =
+                                    candidates.toMutableList().apply {
+                                        removeAt(index)
+                                    }
+                            },
+                            totalContribution = candidates.sumOf { it.contribution },
+                        )
+                    }
+                }
+            } else {
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(200.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        "No candidates yet!\nTap + to add some",
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFF61758A),
+                        fontFamily = FontFamily(Font(R.font.plus_jakarta_sans)),
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 
@@ -360,9 +373,9 @@ fun CandidateItem(
     candidate: WeightedCandidate,
     isEditing: Boolean,
     editingName: String,
-    editingWeight: String,
+    editingContribution: String,
     onEditingNameChange: (String) -> Unit,
-    onEditingWeightChange: (String) -> Unit,
+    onEditingContributionChange: (String) -> Unit,
     onEdit: () -> Unit,
     onSaveEdit: () -> Unit,
     onCancelEdit: () -> Unit,
@@ -396,8 +409,8 @@ fun CandidateItem(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedTextField(
-                    value = editingWeight,
-                    onValueChange = onEditingWeightChange,
+                    value = editingContribution,
+                    onValueChange = onEditingContributionChange,
                     label = { Text("Contribution") },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -648,4 +661,4 @@ private fun selectWeightedRandomCandidate(candidates: List<WeightedCandidate>): 
     }
 
     return candidates.last() // Fallback, should never happen
-} 
+}

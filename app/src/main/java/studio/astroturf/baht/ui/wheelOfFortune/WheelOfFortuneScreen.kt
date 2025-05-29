@@ -24,11 +24,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -94,6 +94,7 @@ fun WheelOfFortuneScreen(onBackClick: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val scrollState = rememberScrollState()
 
     Scaffold(
         topBar = {
@@ -126,6 +127,7 @@ fun WheelOfFortuneScreen(onBackClick: () -> Unit) {
                 Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
+                    .verticalScroll(scrollState)
                     .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -252,7 +254,7 @@ fun WheelOfFortuneScreen(onBackClick: () -> Unit) {
                                 val minRotations = 720f // 2 full rotations minimum
                                 val extraRotation = Random.nextFloat() * 720f // 0-2 additional rotations
                                 val baseRotation = minRotations + extraRotation
-                                
+
                                 val segmentAngle = 360f / items.size
 
                                 // First select a random winner
@@ -341,8 +343,10 @@ fun WheelOfFortuneScreen(onBackClick: () -> Unit) {
 
                         Spacer(modifier = Modifier.height(8.dp))
 
-                        LazyColumn {
-                            itemsIndexed(items) { index, item ->
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            items.forEachIndexed { index, item ->
                                 ItemRow(
                                     item = item,
                                     isEditing = editingIndex == index,
@@ -385,6 +389,9 @@ fun WheelOfFortuneScreen(onBackClick: () -> Unit) {
                     }
                 }
             }
+
+            // Add bottom padding for FAB
+            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
