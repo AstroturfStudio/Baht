@@ -31,6 +31,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import studio.astroturf.baht.ui.coinFlip.CoinFlipScreen
+import studio.astroturf.baht.ui.diceRoll.DiceRollScreen
 import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
@@ -97,28 +98,28 @@ fun RandomNavigation(
             navController = navController,
             startDestination = "random_home",
             modifier = modifier,
-            enterTransition = { 
+            enterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { it },
-                    animationSpec = tween(300)
+                    animationSpec = tween(300),
                 )
             },
-            exitTransition = { 
+            exitTransition = {
                 slideOutHorizontally(
                     targetOffsetX = { -it },
-                    animationSpec = tween(300)
+                    animationSpec = tween(300),
                 )
             },
-            popEnterTransition = { 
+            popEnterTransition = {
                 slideInHorizontally(
                     initialOffsetX = { -it },
-                    animationSpec = tween(300)
+                    animationSpec = tween(300),
                 )
             },
-            popExitTransition = { 
+            popExitTransition = {
                 slideOutHorizontally(
                     targetOffsetX = { it },
-                    animationSpec = tween(300)
+                    animationSpec = tween(300),
                 )
             },
         ) {
@@ -129,6 +130,9 @@ fun RandomNavigation(
                     },
                     onCoinFlipClick = {
                         navController.navigate("coin_flip")
+                    },
+                    onDiceRollClick = {
+                        navController.navigate("dice_roll")
                     },
                     onNumberGeneratorClick = {
                         navController.navigate("number_generator")
@@ -144,6 +148,13 @@ fun RandomNavigation(
             }
             composable("coin_flip") {
                 CoinFlipScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
+            composable("dice_roll") {
+                DiceRollScreen(
                     onBackClick = {
                         navController.popBackStack()
                     },
@@ -172,6 +183,7 @@ enum class AppDestinations(
 fun RandomScreen(
     onLuckyDrawClick: () -> Unit,
     onCoinFlipClick: () -> Unit,
+    onDiceRollClick: () -> Unit,
     onNumberGeneratorClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -193,7 +205,7 @@ fun RandomScreen(
                 imageRes = R.drawable.random_pot,
                 title = "Dice Roll",
                 description = "Roll dice for games and decisions",
-                onClick = { /* TODO: Implement dice roll */ },
+                onClick = onDiceRollClick,
             ),
             RandomizerItemData(
                 imageRes = R.drawable.random_pot,
