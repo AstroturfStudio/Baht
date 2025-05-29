@@ -265,10 +265,12 @@ fun WeightedWheelOfFortuneScreen(onBackClick: () -> Unit) {
                     enter = scaleIn() + fadeIn(),
                     exit = scaleOut() + fadeOut(),
                 ) {
-                    WinnerCard(
-                        winner = selectedItem!!,
-                        totalContribution = items.sumOf { it.contribution },
-                    )
+                    selectedItem?.let { winner ->
+                        WinnerCard(
+                            winner = winner,
+                            totalContribution = items.sumOf { it.contribution },
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -282,17 +284,52 @@ fun WeightedWheelOfFortuneScreen(onBackClick: () -> Unit) {
                                 showResult = false
                                 selectedItem = null
 
-                                val targetRotation = rotation.value + Random.nextFloat() * 360 + 1440
+                                // Ensure minimum 2 full rotations + random extra
+                                val minRotations = 720f // 2 full rotations minimum
+                                val extraRotation = Random.nextFloat() * 720f // 0-2 additional rotations
+                                val baseRotation = minRotations + extraRotation
+
+                                // First select the weighted winner
+                                val winner = selectWeightedItem(items)
+                                if (winner == null) {
+                                    isSpinning = false
+                                    return@launch
+                                }
+                                val winnerIndex = items.indexOf(winner)
+
+                                // Calculate segment angles and positions based on contribution
+                                val totalContribution = items.sumOf { it.contribution }.toFloat()
+                                var currentAngle = 0f
+                                var winnerSegmentCenter = 0f
+
+                                items.forEachIndexed { index, item ->
+                                    val segmentAngle = (item.contribution.toFloat() / totalContribution) * 360f
+                                    if (index == winnerIndex) {
+                                        winnerSegmentCenter = currentAngle + segmentAngle / 2
+                                    }
+                                    currentAngle += segmentAngle
+                                }
+
+                                // The pointer is at the top (270° in wheel coordinates)
+                                // To land the winner under the pointer, we need to rotate so that
+                                // the winner segment center aligns with 270°
+                                val targetAngle = 270f - winnerSegmentCenter
+                                val targetRotation = baseRotation + targetAngle
+
+                                // Dynamic duration based on total rotation
+                                val totalRotationAmount = Math.abs(targetRotation - rotation.value)
+                                val duration = (2000 + (totalRotationAmount / 360f) * 500).toInt().coerceIn(2000, 5000)
+
                                 rotation.animateTo(
                                     targetValue = targetRotation,
                                     animationSpec =
                                         tween(
-                                            durationMillis = 3000,
+                                            durationMillis = duration,
                                             easing = LinearEasing,
                                         ),
                                 )
 
-                                selectedItem = selectWeightedItem(items)
+                                selectedItem = winner
                                 showResult = true
                                 isSpinning = false
                             }
@@ -850,4 +887,4 @@ private fun getSegmentColor(index: Int): Color {
             Color(0xFFE53E3E),
         )
     return colors[index % colors.size]
-} 
+}

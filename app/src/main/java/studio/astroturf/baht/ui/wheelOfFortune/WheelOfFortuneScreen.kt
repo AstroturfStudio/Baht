@@ -248,20 +248,41 @@ fun WheelOfFortuneScreen(onBackClick: () -> Unit) {
                                 showResult = false
                                 selectedItem = null
 
-                                val targetRotation = rotation.value + Random.nextFloat() * 360 + 1440
+                                // Ensure minimum 2 full rotations + random extra
+                                val minRotations = 720f // 2 full rotations minimum
+                                val extraRotation = Random.nextFloat() * 720f // 0-2 additional rotations
+                                val baseRotation = minRotations + extraRotation
+                                
+                                val segmentAngle = 360f / items.size
+
+                                // First select a random winner
+                                val winnerIndex = Random.nextInt(items.size)
+
+                                // Calculate the center angle of the winner segment
+                                // Segments are drawn starting from 0°, so segment i is at i * segmentAngle
+                                val winnerSegmentStart = winnerIndex * segmentAngle
+                                val winnerSegmentCenter = winnerSegmentStart + segmentAngle / 2
+
+                                // The pointer is at the top (270° in wheel coordinates)
+                                // To land the winner under the pointer, we need to rotate so that
+                                // the winner segment center aligns with 270°
+                                val targetAngle = 270f - winnerSegmentCenter
+                                val targetRotation = baseRotation + targetAngle
+
+                                // Dynamic duration based on total rotation
+                                val totalRotation = Math.abs(targetRotation - rotation.value)
+                                val duration = (2000 + (totalRotation / 360f) * 500).toInt().coerceIn(2000, 5000)
+
                                 rotation.animateTo(
                                     targetValue = targetRotation,
                                     animationSpec =
                                         tween(
-                                            durationMillis = 3000,
+                                            durationMillis = duration,
                                             easing = LinearEasing,
                                         ),
                                 )
 
-                                val normalizedRotation = (targetRotation % 360)
-                                val segmentAngle = 360f / items.size
-                                val selectedIndex = ((360 - normalizedRotation + segmentAngle / 2) / segmentAngle).toInt() % items.size
-                                selectedItem = items[selectedIndex]
+                                selectedItem = items[winnerIndex]
                                 showResult = true
                                 isSpinning = false
                             }
@@ -684,4 +705,4 @@ private fun getSegmentColor(index: Int): Color {
             Color(0xFF319795),
         )
     return colors[index % colors.size]
-} 
+}
