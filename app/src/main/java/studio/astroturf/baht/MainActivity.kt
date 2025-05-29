@@ -7,13 +7,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,10 +31,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -215,16 +226,88 @@ fun RandomScreen(
             ),
         )
 
-    LazyColumn(
-        modifier = modifier,
-    ) {
-        items(randomizerItems) { item ->
-            RandomizerItem(
-                imageRes = item.imageRes,
-                title = item.title,
-                description = item.description,
-                onClick = item.onClick,
-            )
+    val listState = rememberLazyListState()
+
+    Box(modifier = modifier) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            items(randomizerItems.size) { index ->
+                RandomizerItem(
+                    imageRes = randomizerItems[index].imageRes,
+                    title = randomizerItems[index].title,
+                    description = randomizerItems[index].description,
+                    onClick = randomizerItems[index].onClick,
+                )
+
+                if (index < randomizerItems.size - 1) {
+                    HorizontalDivider(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp),
+                        thickness = 1.dp,
+                        color = Color(0xFFE8EBF0),
+                    )
+                }
+            }
+        }
+
+        // Scroll indicator
+        androidx.compose.foundation.layout.Column(
+            modifier =
+                Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 8.dp),
+        ) {
+            if (listState.canScrollBackward || listState.canScrollForward) {
+                androidx.compose.foundation.Canvas(
+                    modifier =
+                        Modifier
+                            .width(4.dp)
+                            .height(60.dp)
+                            .padding(vertical = 8.dp),
+                ) {
+                    val trackHeight = size.height
+                    val thumbHeight = trackHeight * 0.3f
+                    val scrollProgress =
+                        if (listState.layoutInfo.totalItemsCount > 0) {
+                            listState.firstVisibleItemIndex.toFloat() /
+                                (listState.layoutInfo.totalItemsCount - listState.layoutInfo.visibleItemsInfo.size).coerceAtLeast(1)
+                        } else {
+                            0f
+                        }
+                    val thumbTop = scrollProgress * (trackHeight - thumbHeight)
+
+                    drawRoundRect(
+                        color =
+                            androidx.compose.ui.graphics
+                                .Color(0x1A3D99F5),
+                        size =
+                            androidx.compose.ui.geometry
+                                .Size(size.width, trackHeight),
+                        cornerRadius =
+                            androidx.compose.ui.geometry
+                                .CornerRadius(2.dp.toPx()),
+                    )
+
+                    drawRoundRect(
+                        color =
+                            androidx.compose.ui.graphics
+                                .Color(0xFF3D99F5),
+                        topLeft =
+                            androidx.compose.ui.geometry
+                                .Offset(0f, thumbTop),
+                        size =
+                            androidx.compose.ui.geometry
+                                .Size(size.width, thumbHeight),
+                        cornerRadius =
+                            androidx.compose.ui.geometry
+                                .CornerRadius(2.dp.toPx()),
+                    )
+                }
+            }
         }
     }
 }
