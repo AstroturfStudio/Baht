@@ -53,6 +53,7 @@ import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
+import studio.astroturf.baht.ui.weightedRandom.WeightedRandomScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -154,6 +155,9 @@ fun RandomNavigation(
                     onNumberGeneratorClick = {
                         navController.navigate("number_generator")
                     },
+                    onWeightedRandomClick = {
+                        navController.navigate("weighted_random")
+                    },
                 )
             }
             composable("lucky_draw") {
@@ -184,6 +188,13 @@ fun RandomNavigation(
                     },
                 )
             }
+            composable("weighted_random") {
+                WeightedRandomScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
@@ -202,6 +213,7 @@ fun RandomScreen(
     onCoinFlipClick: () -> Unit,
     onDiceRollClick: () -> Unit,
     onNumberGeneratorClick: () -> Unit,
+    onWeightedRandomClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -231,6 +243,12 @@ fun RandomScreen(
                 title = "Number Generator",
                 description = "Generate random numbers in any range",
                 onClick = onNumberGeneratorClick,
+            ),
+            RandomizerItemData(
+                imageRes = R.drawable.random_pot,
+                title = "Weighted Random",
+                description = "Select winners based on contribution amounts",
+                onClick = onWeightedRandomClick,
             ),
         )
 
