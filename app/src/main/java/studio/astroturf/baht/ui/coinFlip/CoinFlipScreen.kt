@@ -28,6 +28,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.PriceChange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -178,21 +180,13 @@ fun AnimatedCoin(
                 },
         contentAlignment = Alignment.Center,
     ) {
-        // Coin background
+        // Coin background - grey like a real coin
         Box(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .background(
-                        color =
-                            if (showResult && result != null) {
-                                when (result) {
-                                    CoinSide.HEADS -> Color(0xFFFFD700) // Gold
-                                    CoinSide.TAILS -> Color(0xFFC0C0C0) // Silver
-                                }
-                            } else {
-                                Color(0xFFE0E0E0)
-                            },
+                        color = Color(0xFFC0C0C0), // Silver grey for coin
                         shape = CircleShape,
                     ),
             contentAlignment = Alignment.Center,
@@ -202,21 +196,27 @@ fun AnimatedCoin(
             val showHeadsSide = normalizedRotation > 90f && normalizedRotation < 270f
 
             if (showResult && result != null) {
-                Text(
-                    text =
+                Icon(
+                    imageVector =
                         when (result) {
-                            CoinSide.HEADS -> "👑"
-                            CoinSide.TAILS -> "🪙"
+                            CoinSide.HEADS -> Icons.Filled.AccountCircle
+                            CoinSide.TAILS -> Icons.Filled.PriceChange
                         },
-                    fontSize = 72.sp,
-                    textAlign = TextAlign.Center,
+                    contentDescription = result.name,
+                    modifier = Modifier.size(72.dp),
+                    tint =
+                        when (result) {
+                            CoinSide.HEADS -> Color(0xFF2196F3) // Blue for head
+                            CoinSide.TAILS -> Color(0xFFFF9800) // Orange for cents
+                        },
                 )
             } else {
                 // During animation, show different sides based on rotation
-                Text(
-                    text = if (showHeadsSide) "👑" else "🪙",
-                    fontSize = 72.sp,
-                    textAlign = TextAlign.Center,
+                Icon(
+                    imageVector = if (showHeadsSide) Icons.Filled.AccountCircle else Icons.Filled.PriceChange,
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                    tint = if (showHeadsSide) Color(0xFF2196F3) else Color(0xFFFF9800),
                 )
             }
         }
@@ -292,8 +292,8 @@ fun ResultCard(result: CoinSide) {
             CardDefaults.cardColors(
                 containerColor =
                     when (result) {
-                        CoinSide.HEADS -> Color(0xFF4CAF50)
-                        CoinSide.TAILS -> Color(0xFF2196F3)
+                        CoinSide.HEADS -> Color(0xFF2196F3)
+                        CoinSide.TAILS -> Color(0xFFFF9800)
                     },
             ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
@@ -309,7 +309,7 @@ fun ResultCard(result: CoinSide) {
             Text(
                 text =
                     when (result) {
-                        CoinSide.HEADS -> "👑 HEADS! 👑"
+                        CoinSide.HEADS -> "👤 HEADS! 👤"
                         CoinSide.TAILS -> "🪙 TAILS! 🪙"
                     },
                 fontSize = 24.sp,
