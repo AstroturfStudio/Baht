@@ -67,6 +67,8 @@ class MainActivity : ComponentActivity() {
         // Initialize AdMob
         AdManager.initialize(this)
 
+        // Crashlytics is initialized in BahtApplication.onCreate()
+
         setContent {
             BahtTheme {
                 BahtApp()
