@@ -54,6 +54,7 @@ import studio.astroturf.baht.ui.coinFlip.CoinFlipScreen
 import studio.astroturf.baht.ui.diceRoll.DiceRollScreen
 import studio.astroturf.baht.ui.luckyDraw.LuckyDrawScreen
 import studio.astroturf.baht.ui.numberGenerator.NumberGeneratorScreen
+import studio.astroturf.baht.ui.passwordGenerator.PasswordGeneratorScreen
 import studio.astroturf.baht.ui.randomizer.RandomizerItem
 import studio.astroturf.baht.ui.theme.BahtTheme
 import studio.astroturf.baht.ui.weightedRandom.WeightedRandomScreen
@@ -175,6 +176,9 @@ fun RandomNavigation(
                     onWeightedWheelOfFortuneClick = {
                         navController.navigate("weighted_wheel_of_fortune")
                     },
+                    onPasswordGeneratorClick = {
+                        navController.navigate("password_generator")
+                    },
                 )
             }
             composable("lucky_draw") {
@@ -226,6 +230,13 @@ fun RandomNavigation(
                     },
                 )
             }
+            composable("password_generator") {
+                PasswordGeneratorScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
@@ -247,6 +258,7 @@ fun RandomScreen(
     onWeightedRandomClick: () -> Unit,
     onWheelOfFortuneClick: () -> Unit,
     onWeightedWheelOfFortuneClick: () -> Unit,
+    onPasswordGeneratorClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -294,6 +306,12 @@ fun RandomScreen(
                 title = "Weighted Wheel",
                 description = "Spin a wheel where items have different probabilities",
                 onClick = onWeightedWheelOfFortuneClick,
+            ),
+            RandomizerItemData(
+                imageRes = R.drawable.random_pot,
+                title = "Password Generator",
+                description = "Generate secure passwords with custom settings",
+                onClick = onPasswordGeneratorClick,
             ),
         )
 
