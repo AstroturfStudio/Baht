@@ -70,9 +70,7 @@ Make decisions easier with our comprehensive collection of randomizer tools!
 • 🔀 List Shuffler - Randomize list order
 
 🎨 BEAUTIFUL DESIGN:
-• Modern Material Design interface
 • Smooth animations and transitions
-• Dark/Light theme support
 • Intuitive user experience
 
 🎯 PERFECT FOR:
@@ -81,7 +79,6 @@ Make decisions easier with our comprehensive collection of randomizer tools!
 • Team assignments
 • Random selections
 • Password generation
-• Educational purposes
 
 Download now and let randomness decide! 🎲
 ```
